@@ -1,0 +1,71 @@
+---
+title: "Speed Summary"
+subtitle: "Mobile Watch Your Speed Program"
+author: 
+  - PuYu Liu
+thanks: "Code and data are available at: https://open.toronto.ca/dataset/mobile-watch-your-speed-program-speed-summary/."
+date: "2022 02 05"
+abstract: "This data is obtained by the city of toronto who installed some WYSP (Watch Your Speed Program) device on the street to test the speed of the cars. The data shows the average speed, percentile speed at different locations. We will talk about this dataset in this paper. Find my code here at github: https://github.com/liupuyu2/sta304"
+output:
+  bookdown::pdf_document2
+toc: FALSE
+bibliography: ref.bib
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(knitr)
+library(opendatatoronto)
+```
+
+```{r, include=FALSE, echo=FALSE}
+# Load dataset from the developer's note from the Open Data toronto
+package <- show_package("058236d2-d26e-4622-9665-941b9e7a5229")
+package
+resources <- list_package_resources("058236d2-d26e-4622-9665-941b9e7a5229")
+datastore_resources <- filter(resources, tolower(format) %in% c('csv', 'geojson'))
+data <- filter(datastore_resources, row_number()==1) %>% get_resource()
+data
+```
+
+# Introduction
+
+This data is obtained by City of Toronto who placed some devices called WYSP device. Everyone can request a WYSP device for their street from the residential area.This device consists of two parts: A radar device and LED. The radar is used to test the speed of the vehicle. The LED is used to display the speed of the cars, motorcycles. We can see them very often in GTA.
+
+
+# Data
+
+The data is from Open Data Toronto. The data can be obtained by downloading directly from the website. There exists bias that could be resulted from the error of the WYSP device. (as radar device could be affected by other electrical devices) The standard error of the speed testing device is +- 4 kmph. But if used incorrectly, the speed could be severly biased. And also, I noticed that this data has some outliers, but we cannot determine whether they are valid. 
+
+```{r bills, fig.cap="50th percentile speed", echo = FALSE}
+# First make a histogram of the pct_50 which is the 50th percentile of the speed detected. We can see that in residential area the speed is commonly around 30 kmph. 
+ggplot(data, aes(x = pct_50)) +
+  geom_bar(alpha = 0.8) 
+# Make a table of the head of the date to give a preview.
+hd <- head(data)
+knitr::kable(hd,"simple")
+# Create a piechart showing the percentage of direction of the road.
+slices <- count(data, direction)
+pct <- round(slices$n/sum(slices$n)*100)
+slices$direction <- paste(slices$direction, pct) 
+slices$direction <- paste(slices$direction,"%",sep="")
+pie(slices$n,labels = slices$direction,
+   main="Pie Chart of directions")
+```
+
+
+
+
+\newpage
+(1) @KANE
+(2) @R_language
+(3) @knitr_cite
+(4) @opentoronto
+(5) @dataset_cite
+
+
+# Reference
+
+
